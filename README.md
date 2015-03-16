@@ -2,6 +2,8 @@
 
 ## Setup
 
+### Cordova
+
  1. Clone repo
  2. ```cd``` to repo dir.
  3. Add platform support
@@ -11,3 +13,7 @@
  5. Run:
     * Android: ```cordova run android --device```
     * iOS: ```cordova run ios --device```
+
+### Arduino
+
+ 1. Setup [ir_bridge.ino](https://github.com/sandeepmistry/arduino-BLEPeripheral/blob/master/examples/ir_bridge/ir_bridge.ino) example sketch from [arduino-BLEPeripheral](https://github.com/sandeepmistry/arduino-BLEPeripheral) 
