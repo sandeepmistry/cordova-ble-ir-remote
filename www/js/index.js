@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var SCANNING_INTERVAL             = 5; //seconds
-
 var IR_SERVICE_UUID               = '4952';
 var IR_OUTPUT_CHARACTERISTIC_UUID = '4953';
 var IR_INPUT_CHARACTERISTIC_UUID  = '4954';
@@ -82,33 +80,25 @@ var app = {
         // show scanning
         app.scanningElement.style.display = '';
 
-        console.log('JS: scan');
-        ble.scan([IR_SERVICE_UUID], SCANNING_INTERVAL, function(device) {
-            if (app.deviceId === null) {
-                // discovered device
-                console.log('JS: discovered device');
-                console.log(device);
+        console.log('JS: startScan');
+        ble.startScan([IR_SERVICE_UUID], function(device) {
+            console.log('JS: stopScan');
+            ble.stopScan();
 
-                app.deviceId = device.id;
+            // discovered device
+            console.log('JS: discovered device');
+            console.log(device);
 
-                // hide scanning
-                app.scanningElement.style.display = 'none';
+            app.deviceId = device.id;
 
-                // connect
-                app.connect();
-            }
+            // hide scanning
+            app.scanningElement.style.display = 'none';
+
+            // connect
+            app.connect();
         }, function() {
-            console.log('JS: scan error');
+            console.log('JS: startScan error');
         });
-
-        setTimeout(function() {
-            if (app.deviceId == null) {
-                console.log('JS: scan timeout');
-
-                // scan timed out, restart
-                app.scan();
-            }
-        }, SCANNING_INTERVAL * 1000 + 100);
     },
     connect: function() {
         // show connecting
