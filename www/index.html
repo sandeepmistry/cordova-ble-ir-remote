@@ -24,33 +24,60 @@
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/loaders.min.css" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>BLE IR Remote</title>
     </head>
     <body>
-        <div id="scanning" style="display: none; margin: 20px">
-            Scanning ...
-        </div>
-        <div id="connecting" style="display: none; margin: 20px">
-            Connecting ...
-        </div>
-        <div id="connected" style="display: none; margin: 20px">
-            Connected
-            <br/>
-            <button id="program-mode">Program mode</button>
-            <br/>
-            <button id="power">Power</button>
-            <br/>
-            <button id="volume-up">Volume +</button>
-            <button id="channel-up">Channel +</button>
-            <br/>
-            <button id="volume-down">Volume -</button>
-            <button id="channel-down">Channel -</button>
-            <br/>
-        </div>
+        <section id="scanning" class="hidden">
+            <header>BLE IR Remote</header>
+            <main>
+                <div class="loader-inner line-spin-fade-loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </main>
+            <footer>Scanning &hellip;</footer>
+        </section>
+        <section id="connecting" class="hidden">
+            <header>BLE IR Remote</header>
+            <main>
+                <div class="loader-inner line-spin-fade-loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </main>
+            <footer>Connecting &hellip;</footer>
+        </section>
+
+        <section id="connected" class="hidden">
+            <header>BLE IR Remote</header>
+            <main>
+                <button id="power" class="action">Power</button>
+                <button id="channel-up" class="action">Channel +</button>
+                <button id="channel-down" class="action">Channel -</button>
+                <button id="volume-up" class="action">Volume +</button>
+                <button id="volume-down" class="action">Volume -</button>
+            </main>
+            <footer>
+                <button id="program" class="program">Program</button>
+            </footer>
+        </section>
 
         <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript" src="js/fastclick.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
     </body>
 </html>

@@ -29,11 +29,6 @@ var app = {
         this.lastButtonId = null;
         this.programMode = false;
 
-        // store elements for each screen
-        this.scanningElement = document.getElementById('scanning');
-        this.connectingElement = document.getElementById('connecting');
-        this.connectedElement = document.getElementById('connected');
-
         this.bindEvents();
     },
     // Bind Event Listeners
@@ -65,11 +60,14 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
-
-        console.log('Received Event: ' + id);
-
         // start scanning for peripheral
         app.scan();
+    },
+    showElementById: function(id) {
+        document.getElementById(id).classList.remove('hidden');
+    },
+    hideElementById: function(id) {
+        document.getElementById(id).classList.add('hidden');
     },
     scan: function() {
         // reset
@@ -78,21 +76,16 @@ var app = {
         app.lastButtonId = null;
 
         // show scanning
-        app.scanningElement.style.display = '';
+        app.showElementById('scanning');
 
-        console.log('JS: startScan');
         ble.startScan([IR_SERVICE_UUID], function(device) {
-            console.log('JS: stopScan');
             ble.stopScan();
 
             // discovered device
-            console.log('JS: discovered device');
-            console.log(device);
-
             app.deviceId = device.id;
 
             // hide scanning
-            app.scanningElement.style.display = 'none';
+            app.hideElementById('scanning');
 
             // connect
             app.connect();
@@ -102,103 +95,114 @@ var app = {
     },
     connect: function() {
         // show connecting
-        app.connectingElement.style.display = '';
+        app.showElementById('connecting');
 
-        console.log('JS: connect');
         ble.connect(app.deviceId, function(device) {
-            console.log('JS: connected');
             // hide connecting, show connected
-            app.connectingElement.style.display = 'none';
-            app.connectedElement.style.display = '';
+            app.hideElementById('connecting');
+            app.showElementById('connected');
+
+            app.updateActionButtons();
 
             // start listening to input
             ble.startNotification(app.deviceId, IR_SERVICE_UUID, IR_INPUT_CHARACTERISTIC_UUID, app.onIrInputNotify);
         }, function() {
-            console.log('JS: disconnect or connection error');
-
             // hide connected and connecting
-            app.connectedElement.style.display = 'none';
-            app.connectingElement.style.display = 'none';
+            app.hideElementById('connecting');
+            app.hideElementById('connected');
 
             // restart scanning
             app.scan();
         });
     },
-    onButtonClicked: function(button) {
-        var buttonId = button.id;
-        var buttons = document.querySelectorAll('button');
+    updateActionButtons: function() {
+        var actionButtons = document.querySelectorAll('button.action');
 
-        if (buttonId === 'program-mode') {
-            app.programMode = !app.programMode;
+        for (var i = 0; i < actionButtons.length; i++) {
+            var actionButton = actionButtons[i];
+            var id = actionButton.id;
 
-            // toggle program mode
-            for (var i = 0; i < buttons.length; i++) {
-                if (buttons[i].id !== 'program-mode') {
-                    buttons[i].style.backgroundColor = this.programMode ? '#55f' : '#eee';
-                }
-            }
+            var programMode = (app.lastButtonId === null) || (app.lastButtonId === id);
+            var isProgrammed = (localStorage.getItem(id) !== null);
 
-            app.lastButtonId = null;
-        } else if (app.programMode) {
-            // select button to program
-            for (var i = 0; i < buttons.length; i++) {
-                if (buttons[i].id !== 'program-mode') {
-                    buttons[i].style.backgroundColor = (buttons[i].id === buttonId) ? '#5f5' : '#eee';
-                }
-            }
+            var enabled = app.programMode ? programMode : isProgrammed;
 
-            // store
-            app.lastButtonId = buttonId;
-        } else {
-            var dataStr = localStorage.getItem(buttonId);
+            actionButton.disabled = !enabled;
 
-            if (dataStr) {
-                // have a stored button
-
-                // convert hex string to array
-                var data = new Uint8Array(dataStr.length / 2);
-
-                for (var i = 0, j = 0; i < dataStr.length; i += 2, j++) {
-                    data[j] = parseInt(dataStr.substr(i, 2), 16);
-                }
-
-                // write
-                ble.write(app.deviceId, IR_SERVICE_UUID, IR_OUTPUT_CHARACTERISTIC_UUID, data.buffer);
+            if (app.programMode && programMode) {
+                actionButton.classList.add('program-mode');
+            } else {
+                actionButton.classList.remove('program-mode');
             }
         }
     },
+    onButtonClicked: function(button) {
+        var buttonId = button.id;
+
+        if (buttonId === 'program') {
+            app.programMode = !app.programMode;
+            app.lastButtonId = null;
+
+            app.updateActionButtons();
+        } else if (app.programMode) {
+            app.lastButtonId = buttonId;
+
+            app.updateActionButtons();
+        } else {
+            var hexDataString = localStorage.getItem(buttonId);
+
+            if (hexDataString) {
+                // have a stored button
+                var buffer = app.hexStringToBuffer(hexDataString);
+
+                app.sendCode(buffer);
+            }
+        }
+    },
+    sendCode: function(buffer) {
+        // write
+        ble.write(app.deviceId, IR_SERVICE_UUID, IR_OUTPUT_CHARACTERISTIC_UUID, buffer);
+    },
     onIrInputNotify: function(buffer) {
         // got a notification from the receiver
-        console.log('JS: notification data');
 
-        // convert buffer to hex string
-        var data = new Uint8Array(buffer);
-        var dataStr = '';
-
-        for (var i = 0; i < data.length; i++) {
-            if (data[i] < 0x10) {
-                dataStr += '0';
-            }
-
-            dataStr += data[i].toString(16);
-        }
-
-        console.log('JS: IR in ' + dataStr);
+        var string = app.bufferToHexString(buffer);
 
         if (app.lastButtonId) {
             // store value for button in program mode
-            localStorage.setItem(app.lastButtonId, dataStr);
+            localStorage.setItem(app.lastButtonId, string);
 
             // exit program mode
-            app.lastButtonId = null;
             app.programMode = false;
+            app.lastButtonId = null;
 
-            var buttons = document.querySelectorAll('button');
-
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].style.backgroundColor = '#eee';
-            }
+            app.updateActionButtons();
         }
+    },
+    hexStringToBuffer: function(string) {
+        // convert hex string to array
+        var data = new Uint8Array(string.length / 2);
+
+        for (var i = 0, j = 0; i < string.length; i += 2, j++) {
+            data[j] = parseInt(string.substr(i, 2), 16);
+        }
+
+        return data.buffer;
+    },
+    bufferToHexString: function(buffer) {
+        // convert buffer to hex string
+        var data = new Uint8Array(buffer);
+        var string = '';
+
+        for (var i = 0; i < data.length; i++) {
+            if (data[i] < 0x10) {
+                string += '0';
+            }
+
+            string += data[i].toString(16);
+        }
+
+        return string;
     }
 };
 
