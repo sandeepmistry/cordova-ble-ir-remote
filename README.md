@@ -16,17 +16,20 @@
 
 ### Arduino
 
- 1. Setup [ir_bridge.ino](https://github.com/sandeepmistry/arduino-BLEPeripheral/blob/master/examples/ir_bridge/ir_bridge.ino) example sketch from [arduino-BLEPeripheral](https://github.com/sandeepmistry/arduino-BLEPeripheral) 
+ 1. Setup [ir_bridge.ino](https://github.com/sandeepmistry/arduino-BLEPeripheral/blob/master/examples/ir_bridge/ir_bridge.ino) example sketch from [arduino-BLEPeripheral](https://github.com/sandeepmistry/arduino-BLEPeripheral)
 
 ## Usage
 
-### Program mode
-
- 1. Press "Program Mode" button, buttons turn blue.
- 2. Press button you wish to program, selected button turns green.
- 3. Point regular IR remote at IR receiver attached to Arduino, press button the remote.
- 4. All buttons return gray, value for button saved in app.
- 
 ### Regular mode
 
- 1. Tap programmed button, saved IR single from program mode sent.
+ 1. Press black button to send programmed button IR signal.
+
+__Note__: Unprogrammed buttons are disabled (grayed out).
+
+### Program mode
+
+ 1. Press "Program" button, buttons turn blue.
+ 2. Press button you wish to program, selected button remains blue (others disabled).
+ 3. Point regular IR remote at IR receiver attached to Arduino, press button the remote.
+ 4. Value for button saved in app.
+ 5. App switches to regular mode.
