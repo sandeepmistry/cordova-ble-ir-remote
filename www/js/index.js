@@ -160,9 +160,9 @@ var app = {
     onIrInputNotify: function(buffer) {
         // got a notification from the receiver
 
-        var string = app.bufferToHexString(buffer);
-
         if (app.lastButtonId) {
+            var string = app.bufferToHexString(buffer);
+
             // store value for button in program mode
             localStorage.setItem(app.lastButtonId, string);
 
