@@ -63,12 +63,6 @@ var app = {
         // start scanning for peripheral
         app.scan();
     },
-    showElementById: function(id) {
-        document.getElementById(id).classList.remove('hidden');
-    },
-    hideElementById: function(id) {
-        document.getElementById(id).classList.add('hidden');
-    },
     scan: function() {
         // reset
         app.deviceId = null;
@@ -178,6 +172,12 @@ var app = {
 
             app.updateActionButtons();
         }
+    },
+    showElementById: function(id) {
+        document.getElementById(id).classList.remove('hidden');
+    },
+    hideElementById: function(id) {
+        document.getElementById(id).classList.add('hidden');
     },
     hexStringToBuffer: function(string) {
         // convert hex string to array
