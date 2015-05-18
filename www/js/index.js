@@ -17,9 +17,9 @@
  * under the License.
  */
 
-var IR_SERVICE_UUID               = '4952';
-var IR_OUTPUT_CHARACTERISTIC_UUID = '4953';
-var IR_INPUT_CHARACTERISTIC_UUID  = '4954';
+var IR_SERVICE_UUID               = '00004952-0000-bbbb-0123-456789abcdef';
+var IR_OUTPUT_CHARACTERISTIC_UUID = '00004953-0000-bbbb-0123-456789abcdef';
+var IR_INPUT_CHARACTERISTIC_UUID  = '00004954-0000-bbbb-0123-456789abcdef';
 
 var app = {
     // Application Constructor
